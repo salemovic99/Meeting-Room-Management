@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -27,6 +27,18 @@ import { useI18n } from "@/lib/i18n";
 import { fromRiyadhWall, toRiyadhWall } from "@/lib/time";
 import { colorFor } from "@/lib/utils";
 import type { Booking } from "@/lib/types";
+
+// FullCalendar treats any new object/array/function prop as a changed option and re-processes it
+// (a new `now` even rebuilds the date range and fires `datesSet` again). Keep static options at
+// module level so every render passes the same references.
+const PLUGINS = [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin];
+const LOCALES = [enGbLocale, arLocale];
+const HEADER_TOOLBAR = {
+  left: "prev,next today",
+  center: "title",
+  right: "timeGridDay,timeGridWeek,dayGridMonth,listWeek",
+};
+const TIME_FORMAT = { hour: "2-digit", minute: "2-digit", hour12: false } as const;
 
 /**
  * FullCalendar has no named-timezone support without a plugin, so we run it in "UTC" and
@@ -74,9 +86,20 @@ export default function CalendarPage() {
     [calendar.data, roomColor],
   );
 
-  const onDatesSet = (arg: DatesSetArg) => {
-    setRange({ from: fromRiyadhWall(arg.start), to: fromRiyadhWall(arg.end) });
-  };
+  // Only update state when the visible range really changed; otherwise datesSet -> setState ->
+  // re-render -> datesSet loops until React aborts ("Maximum update depth exceeded").
+  const onDatesSet = useCallback((arg: DatesSetArg) => {
+    const from = fromRiyadhWall(arg.start);
+    const to = fromRiyadhWall(arg.end);
+    setRange((prev) => (prev && prev.from === from && prev.to === to ? prev : { from, to }));
+  }, []);
+
+  const now = useCallback(() => toRiyadhWall(Date.now()), []);
+
+  const buttonText = useMemo(
+    () => ({ today: t("Today"), day: t("Day"), week: t("Week"), month: t("Month"), list: t("Agenda") }),
+    [t],
+  );
 
   const onSelect = (arg: DateSelectArg) => {
     if (!can("bookings.create")) return;
@@ -171,17 +194,13 @@ export default function CalendarPage() {
 
       <Card className="p-3 md:p-4">
         <FullCalendar
-          plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+          plugins={PLUGINS}
           initialView="timeGridWeek"
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "timeGridDay,timeGridWeek,dayGridMonth,listWeek",
-          }}
-          buttonText={{ today: t("Today"), day: t("Day"), week: t("Week"), month: t("Month"), list: t("Agenda") }}
+          headerToolbar={HEADER_TOOLBAR}
+          buttonText={buttonText}
           timeZone="UTC"
-          now={() => toRiyadhWall(Date.now())}
-          locales={[enGbLocale, arLocale]}
+          now={now}
+          locales={LOCALES}
           locale={lang === "ar" ? "ar" : "en-gb"}
           direction={lang === "ar" ? "rtl" : "ltr"}
           firstDay={0}
@@ -197,8 +216,8 @@ export default function CalendarPage() {
           allDaySlot={false}
           height="auto"
           expandRows
-          eventTimeFormat={{ hour: "2-digit", minute: "2-digit", hour12: false }}
-          slotLabelFormat={{ hour: "2-digit", minute: "2-digit", hour12: false }}
+          eventTimeFormat={TIME_FORMAT}
+          slotLabelFormat={TIME_FORMAT}
           events={events}
           datesSet={onDatesSet}
           select={onSelect}
