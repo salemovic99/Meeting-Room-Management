@@ -126,13 +126,11 @@ export class ReconnectingSocket {
       return;
     }
     this.ws = ws;
-    const self = this;
-
-    ws.onopen = function () {
+    ws.onopen = () => {
       ws.send(JSON.stringify({ type: "auth", token: token }));
     };
 
-    ws.onmessage = function (ev: MessageEvent) {
+    ws.onmessage = (ev: MessageEvent) => {
       let msg: RealtimeMessage;
       try {
         msg = JSON.parse(String(ev.data)) as RealtimeMessage;
@@ -140,30 +138,30 @@ export class ReconnectingSocket {
         return;
       }
       if (msg.type === "auth.ok") {
-        self.attempt = 0;
-        self.setState("open");
-        self.pingTimer = setInterval(function () {
+        this.attempt = 0;
+        this.setState("open");
+        this.pingTimer = setInterval(() => {
           if (ws.readyState === 1) ws.send(JSON.stringify({ type: "ping" }));
-        }, self.opts.pingIntervalMs || 30000);
-        if (self.opts.onAuthenticated) self.opts.onAuthenticated(msg);
+        }, this.opts.pingIntervalMs || 30000);
+        if (this.opts.onAuthenticated) this.opts.onAuthenticated(msg);
         return;
       }
-      self.opts.onMessage(msg);
+      this.opts.onMessage(msg);
     };
 
-    ws.onclose = function (ev: CloseEvent) {
-      if (self.ws !== ws) return;
-      self.ws = null;
-      self.clearTimers();
-      self.setState("closed");
-      if (ev.code >= 4000 && self.opts.onServerClose) {
-        const proceed = self.opts.onServerClose(ev.code);
+    ws.onclose = (ev: CloseEvent) => {
+      if (this.ws !== ws) return;
+      this.ws = null;
+      this.clearTimers();
+      this.setState("closed");
+      if (ev.code >= 4000 && this.opts.onServerClose) {
+        const proceed = this.opts.onServerClose(ev.code);
         if (proceed === false) {
-          self.stopped = true;
+          this.stopped = true;
           return;
         }
       }
-      self.scheduleReconnect();
+      this.scheduleReconnect();
     };
 
     ws.onerror = function () {
