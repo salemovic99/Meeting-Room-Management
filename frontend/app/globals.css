@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brand: primary #00594F (173 100% 17.5%), secondary #BB9D5A (41 42% 54%) */
+@layer base {
+  :root {
+    --font-sans: "Inter", "Segoe UI", "Noto Sans Arabic", system-ui, sans-serif;
+    --background: 0 0% 100%;
+    --foreground: 200 20% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 200 20% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 20% 10%;
+    --primary: 173 100% 17.5%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 41 42% 54%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 180 10% 95%;
+    --muted-foreground: 200 8% 42%;
+    --accent: 173 30% 93%;
+    --accent-foreground: 173 100% 15%;
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 70% 32%;
+    --warning: 32 92% 42%;
+    --border: 180 8% 88%;
+    --input: 180 8% 85%;
+    --ring: 173 100% 22%;
+    --radius: 0.75rem;
+    --sidebar: 173 100% 13%;
+    --sidebar-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 200 18% 7%;
+    --foreground: 0 0% 96%;
+    --card: 200 16% 10%;
+    --card-foreground: 0 0% 96%;
+    --popover: 200 16% 10%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 173 60% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 41 45% 58%;
+    --secondary-foreground: 200 20% 8%;
+    --muted: 200 12% 15%;
+    --muted-foreground: 200 8% 65%;
+    --accent: 173 30% 16%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 70% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 60% 45%;
+    --warning: 38 92% 55%;
+    --border: 200 12% 18%;
+    --input: 200 12% 22%;
+    --ring: 173 60% 42%;
+    --sidebar: 200 18% 9%;
+    --sidebar-foreground: 0 0% 96%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+}
+
+/* ---------- FullCalendar theme integration ---------- */
+.fc {
+  --fc-border-color: hsl(var(--border));
+  --fc-page-bg-color: hsl(var(--card));
+  --fc-neutral-bg-color: hsl(var(--muted));
+  --fc-today-bg-color: hsl(var(--accent) / 0.5);
+  --fc-now-indicator-color: hsl(var(--destructive));
+  --fc-button-bg-color: hsl(var(--background));
+  --fc-button-text-color: hsl(var(--foreground));
+  --fc-button-border-color: hsl(var(--border));
+  --fc-button-hover-bg-color: hsl(var(--accent));
+  --fc-button-hover-border-color: hsl(var(--border));
+  --fc-button-active-bg-color: hsl(var(--primary));
+  --fc-button-active-border-color: hsl(var(--primary));
+  --fc-list-event-hover-bg-color: hsl(var(--muted));
+  font-size: 0.875rem;
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  color: hsl(var(--primary-foreground));
+}
+.fc .fc-toolbar-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.fc .fc-event {
+  cursor: pointer;
+}
+.fc .fc-event.is-cancelled {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+/* ---------- TV display ----------
+ * The display stage targets Chromium 69 (Samsung Tizen 5.5). Avoid `inset`, flex `gap`,
+ * `aspect-ratio` and other post-2020 CSS on that page; use margins / grid-gap instead. */
+.tv-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: tv-marquee 30s linear infinite;
+}
+@keyframes tv-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+[dir="rtl"] .tv-marquee {
+  padding-left: 0;
+  padding-right: 100%;
+  animation-name: tv-marquee-rtl;
+}
+@keyframes tv-marquee-rtl {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(100%); }
+}

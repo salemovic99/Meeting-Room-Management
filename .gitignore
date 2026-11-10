@@ -1,0 +1,15 @@
+.env
+*.env.local
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+.next/
+frontend/out/
+infrastructure/backups/*
+!infrastructure/backups/.gitkeep
+infrastructure/nginx/certs/*
+!infrastructure/nginx/certs/.gitkeep
