@@ -123,3 +123,11 @@
   0% { transform: translateX(0); }
   100% { transform: translateX(100%); }
 }
+/* "Live" sync dot on the TV footer — opacity only, cheap on TV GPUs. */
+.tv-pulse {
+  animation: tv-pulse 2s ease-in-out infinite;
+}
+@keyframes tv-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}

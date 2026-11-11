@@ -88,6 +88,7 @@ export const ar: Record<string, string> = {
   "Upcoming meetings": "الاجتماعات القادمة",
   "No more meetings today": "لا توجد اجتماعات أخرى اليوم",
   "Next meeting": "الاجتماع التالي",
+  "Up next": "التالي",
   "Remaining": "المتبقي",
   "Starts in": "يبدأ خلال",
   "Free until": "متاحة حتى",
